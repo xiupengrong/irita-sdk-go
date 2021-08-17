@@ -14,11 +14,12 @@ var once sync.Once
 type grpcClient struct {
 }
 
-func NewGRPCClient(url string) types.GRPCClient {
+func NewGRPCClient(url string, info types.BSNProjectInfo) types.GRPCClient {
 	once.Do(func() {
 
 		dialOpts := []grpc.DialOption{
 			grpc.WithInsecure(),
+			grpc.WithPerRPCCredentials(NewBsnToken(info)),
 		}
 		clientConn, err := grpc.Dial(url, dialOpts...)
 		if err != nil {

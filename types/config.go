@@ -58,6 +58,15 @@ type ClientConfig struct {
 
 	//whether to enable caching
 	Cached bool
+
+	// BSN ProjectId ProjectKey ChainAccountAddress
+	BSNProject BSNProjectInfo
+}
+
+type BSNProjectInfo struct {
+	ProjectId           string
+	ProjectKey          string
+	ChainAccountAddress string
 }
 
 func NewClientConfig(uri, grpcAddr, chainID string, options ...Option) (ClientConfig, error) {
@@ -116,6 +125,10 @@ func (cfg *ClientConfig) checkAndSetDefault() error {
 	}
 
 	if err := MaxTxBytesOption(cfg.MaxTxBytes)(cfg); err != nil {
+		return err
+	}
+
+	if err := BSNProjectInfoOption(cfg.BSNProject)(cfg); err != nil {
 		return err
 	}
 
@@ -225,4 +238,14 @@ func CachedOption(enabled bool) Option {
 		cfg.Cached = enabled
 		return nil
 	}
+}
+
+func BSNProjectInfoOption(info BSNProjectInfo) Option {
+	return func(cfg *ClientConfig) error {
+		cfg.BSNProject.ProjectId = info.ProjectId
+		cfg.BSNProject.ProjectKey = info.ProjectKey
+		cfg.BSNProject.ChainAccountAddress = info.ChainAccountAddress
+		return nil
+	}
+
 }
